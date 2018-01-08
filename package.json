@@ -1,0 +1,22 @@
+{
+  "name": "prioritysort",
+  "version": "0.0.0",
+  "description": "Webtool allowing for manual sorting of a list",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AdriaanWessels/PrioritySort.git"
+  },
+  "author": "Adriaan Wessels",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AdriaanWessels/PrioritySort/issues"
+  },
+  "homepage": "https://github.com/AdriaanWessels/PrioritySort#readme",
+  "dependencies": {
+    "webpack": "^3.10.0"
+  }
+}
