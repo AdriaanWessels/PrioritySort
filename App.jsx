@@ -21,11 +21,13 @@ class App extends React.Component {
 
   sortData(e) {
     let dataArr = this.state.data.split("\n");
-
+    dataArr.push("test!");
+    let newData = dataArr.join("\n");
+    console.log("test!");
     this.setState({
       buttonA: "clickA",
       buttonB: "clickB",
-      data: dataArr
+      data: newData
     });
   }
 
