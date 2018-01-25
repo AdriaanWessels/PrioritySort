@@ -7,6 +7,8 @@ class App extends React.Component {
 
     this.state = {
       data: "a\nb\nh\nc\ng\nd\ne\nf",
+      dataArr: [],
+      showButtons: false,
       buttonA: "",
       buttonB: "",
       i: 1,
@@ -14,6 +16,8 @@ class App extends React.Component {
       lo: 0
     };
     this.updateState = this.updateState.bind(this);
+    this.setButtonValues = this.setButtonValues.bind(this);
+    this.sortSetup = this.sortSetup.bind(this);
     this.sortData = this.sortData.bind(this);
   }
 
@@ -21,11 +25,27 @@ class App extends React.Component {
     this.setState({ data: e.target.value });
   }
 
+  setButtonValues(e) {
+    // update the button text
+    let newMid = Math.floor((this.state.hi + this.state.lo) / 2);
+    this.setState({
+      buttonA: this.state.dataArr[newMid],
+      buttonB: this.state.dataArr[this.state.i]
+    });
+  }
+
+  sortSetup(e) {
+    this.state.dataArr = this.state.data.split("\n");
+    this.setButtonValues();
+    this.setState({
+      showButtons: true
+    });
+  }
+
   sortData(e) {
-    let dataArr = this.state.data.split("\n");
     let mid = Math.floor((this.state.hi + this.state.lo) / 2);
 
-    if (this.state.i < dataArr.length) {
+    if (this.state.i < this.state.dataArr.length) {
       // perform the next step of the binary search
       switch (e.target.value) {
         case this.state.buttonA:
@@ -39,11 +59,12 @@ class App extends React.Component {
 
       if (this.state.lo > this.state.hi) {
         // if the binary search is done insert A[i] in the correct place
-        let tmpItem = dataArr[this.state.i];
-        dataArr.splice(this.state.i, 1);
-        dataArr.splice(this.state.lo, 0, tmpItem);
+        let tmpItem = this.state.dataArr[this.state.i];
+        // !!! AVOID DIRECT STATE MANIPULATION !!!
+        this.state.dataArr.splice(this.state.i, 1);
+        this.state.dataArr.splice(this.state.lo, 0, tmpItem);
         this.setState({
-          data: dataArr.join("\n")
+          data: this.state.dataArr.join("\n")
         });
         // move to the next element
         this.state.i++;
@@ -51,19 +72,19 @@ class App extends React.Component {
         this.state.lo = 0;
       }
 
-      if (this.state.i < dataArr.length) {
-        // update the button text
-        let newMid = Math.floor((this.state.hi + this.state.lo) / 2);
-        console.log("newMid:" + newMid);
-        this.setState({
-          buttonA: dataArr[newMid],
-          buttonB: dataArr[this.state.i]
-        });
+      if (this.state.i < this.state.dataArr.length) {
+        // set button text up for next comparison
+        this.setButtonValues();
       } else {
-        // data is sorted
+        // sort is done, hide buttons
         this.setState({
+          dataArr: [],
+          showButtons: false,
           buttonA: "",
-          buttonB: ""
+          buttonB: "",
+          i: 1,
+          hi: 1,
+          lo: 0
         });
       }
     }
@@ -80,19 +101,23 @@ class App extends React.Component {
           onChange={this.updateState}
         />
         <hr />
-        <input type="button" value="sort" onClick={this.sortData} />
+        <input type="button" value="sort" onClick={this.sortSetup} />
         <hr />
-        <input
-          type="button"
-          value={this.state.buttonA}
-          onClick={this.sortData}
-        />
-        <br />
-        <input
-          type="button"
-          value={this.state.buttonB}
-          onClick={this.sortData}
-        />
+        {this.state.showButtons ? (
+          <div>
+            <input
+              type="button"
+              value={this.state.buttonA}
+              onClick={this.sortData}
+            />
+            <br />
+            <input
+              type="button"
+              value={this.state.buttonB}
+              onClick={this.sortData}
+            />
+          </div>
+        ) : null}
         <h4>{this.state.data}</h4>
       </div>
     );
