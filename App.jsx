@@ -1,12 +1,15 @@
 "use strict";
 import React from "react";
 
+// check on resorting a sorted list
 class App extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      data: "a\nb\nh\nc\ng\nd\ne\nf",
+      //data: "a\nb\nh\nc", //\ng\nd\ne\nf",
+      //data: "a\nb\nh\nc\ng\nd\ne\nf",
+      data: "3\n2\n1",
       dataArr: [],
       showButtons: false,
       buttonA: "",
@@ -57,19 +60,25 @@ class App extends React.Component {
           break;
       }
 
-      if (this.state.lo > this.state.hi) {
-        // if the binary search is done insert A[i] in the correct place
-        let tmpItem = this.state.dataArr[this.state.i];
-        // !!! AVOID DIRECT STATE MANIPULATION !!!
-        this.state.dataArr.splice(this.state.i, 1);
-        this.state.dataArr.splice(this.state.lo, 0, tmpItem);
-        this.setState({
-          data: this.state.dataArr.join("\n")
-        });
-        // move to the next element
-        this.state.i++;
-        this.state.hi = this.state.i;
-        this.state.lo = 0;
+      switch (true) {
+        case this.state.lo > this.state.hi:
+          // The binary search is done, insert A[i] at A[lo]
+          let tmpItem = this.state.dataArr[this.state.i];
+          let tmpArr = this.state.dataArr;
+          tmpArr.splice(this.state.i, 1);
+          tmpArr.splice(this.state.lo, 0, tmpItem);
+
+          this.setState({
+            dataArr: tmpArr,
+            data: tmpArr.join("\n")
+          });
+        // fall through to next case
+
+        case this.state.i === this.state.hi && this.state.i === this.state.lo:
+          // A[i] is in the correct place, so move to the next element
+          this.state.i++;
+          this.state.hi = this.state.i;
+          this.state.lo = 0;
       }
 
       if (this.state.i < this.state.dataArr.length) {
@@ -101,7 +110,35 @@ class App extends React.Component {
           onChange={this.updateState}
         />
         <hr />
-        <input type="button" value="sort" onClick={this.sortSetup} />
+        <table>
+          <tbody>
+            <tr>
+              <td>data:</td>
+              <td>{this.state.data}</td>
+            </tr>
+            <tr>
+              <td>dataArr:</td>
+              <td>{this.state.dataArr}</td>
+            </tr>
+            <tr>
+              <td>i:</td>
+              <td>{this.state.i}</td>
+            </tr>
+            <tr>
+              <td>hi:</td>
+              <td>{this.state.hi}</td>
+            </tr>
+            <tr>
+              <td>mid:</td>
+              <td>{Math.floor((this.state.hi + this.state.lo) / 2)}</td>
+            </tr>
+            <tr>
+              <td>lo:</td>
+              <td>{this.state.lo}</td>
+            </tr>
+          </tbody>
+        </table>
+
         <hr />
         {this.state.showButtons ? (
           <div>
@@ -117,8 +154,9 @@ class App extends React.Component {
               onClick={this.sortData}
             />
           </div>
-        ) : null}
-        <h4>{this.state.data}</h4>
+        ) : (
+          <input type="button" value="sort" onClick={this.sortSetup} />
+        )}
       </div>
     );
   }
