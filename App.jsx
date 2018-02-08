@@ -1,15 +1,11 @@
 "use strict";
 import React from "react";
-
-// check on resorting a sorted list
-class App extends React.Component {
+class ManualSort extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      //data: "a\nb\nh\nc", //\ng\nd\ne\nf",
-      //data: "a\nb\nh\nc\ng\nd\ne\nf",
-      data: "3\n2\n1",
+      data: "",
       dataArr: [],
       showButtons: false,
       buttonA: "",
@@ -18,6 +14,7 @@ class App extends React.Component {
       hi: 1,
       lo: 0
     };
+
     this.updateState = this.updateState.bind(this);
     this.setButtonValues = this.setButtonValues.bind(this);
     this.sortSetup = this.sortSetup.bind(this);
@@ -72,13 +69,14 @@ class App extends React.Component {
             dataArr: tmpArr,
             data: tmpArr.join("\n")
           });
-        // fall through to next case
+        // drop through to the next case
 
         case this.state.i === this.state.hi && this.state.i === this.state.lo:
           // A[i] is in the correct place, so move to the next element
           this.state.i++;
           this.state.hi = this.state.i;
           this.state.lo = 0;
+          break;
       }
 
       if (this.state.i < this.state.dataArr.length) {
@@ -101,64 +99,69 @@ class App extends React.Component {
 
   render() {
     return (
-      <div>
-        <h1>Enter your list below</h1>
-        <textarea
-          rows="10"
-          cols="50"
-          value={this.state.data}
-          onChange={this.updateState}
-        />
-        <hr />
-        <table>
-          <tbody>
-            <tr>
-              <td>data:</td>
-              <td>{this.state.data}</td>
-            </tr>
-            <tr>
-              <td>dataArr:</td>
-              <td>{this.state.dataArr}</td>
-            </tr>
-            <tr>
-              <td>i:</td>
-              <td>{this.state.i}</td>
-            </tr>
-            <tr>
-              <td>hi:</td>
-              <td>{this.state.hi}</td>
-            </tr>
-            <tr>
-              <td>mid:</td>
-              <td>{Math.floor((this.state.hi + this.state.lo) / 2)}</td>
-            </tr>
-            <tr>
-              <td>lo:</td>
-              <td>{this.state.lo}</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <hr />
-        {this.state.showButtons ? (
-          <div>
-            <input
-              type="button"
-              value={this.state.buttonA}
-              onClick={this.sortData}
-            />
-            <br />
-            <input
-              type="button"
-              value={this.state.buttonB}
-              onClick={this.sortData}
-            />
-          </div>
-        ) : (
-          <input type="button" value="sort" onClick={this.sortSetup} />
-        )}
-      </div>
+      <SortBox
+        {...this.state}
+        onChange={this.updateState}
+        onClick={this.sortData}
+        onStart={this.sortSetup}
+      />
     );
   }
 }
-export default App;
+
+// check on resorting a sorted list
+function SortBox(props) {
+  return (
+    <div>
+      <h1>Enter your list below</h1>
+      <textarea
+        rows="10"
+        cols="50"
+        value={props.data}
+        onChange={props.onChange}
+      />
+      <hr />
+      <table>
+        <tbody>
+          <tr>
+            <td>data:</td>
+            <td>{props.data}</td>
+          </tr>
+          <tr>
+            <td>dataArr:</td>
+            <td>{props.dataArr}</td>
+          </tr>
+          <tr>
+            <td>i:</td>
+            <td>{props.i}</td>
+          </tr>
+          <tr>
+            <td>hi:</td>
+            <td>{props.hi}</td>
+          </tr>
+          <tr>
+            <td>mid:</td>
+            <td>{Math.floor((props.hi + props.lo) / 2)}</td>
+          </tr>
+          <tr>
+            <td>lo:</td>
+            <td>{props.lo}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <hr />
+      {props.showButtons ? (
+        <div>
+          <input type="button" value={props.buttonA} onClick={props.onClick} />
+          <br />
+          <input type="button" value={props.buttonB} onClick={props.onClick} />
+        </div>
+      ) : (
+        <input type="button" value="sort" onClick={props.onStart} />
+      )}
+    </div>
+  );
+}
+
+export default ManualSort;
