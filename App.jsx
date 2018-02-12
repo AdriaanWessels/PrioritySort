@@ -20,31 +20,58 @@ class ManualSort extends React.Component {
       index: 0
     };
 
+    this.rewind = this.rewind.bind(this);
+    this.fastForward = this.fastForward.bind(this);
     this.updateState = this.updateState.bind(this);
     this.sortSetup = this.sortSetup.bind(this);
     this.sortData = this.sortData.bind(this);
   }
 
   addToHistory(stateChanges) {
-    const history = this.state.history;
-    const current = history[history.length - 1];
-
+    let history = this.state.history;
+    let current = Object.assign({}, history[this.state.index]); //create a copy
+    console.log("In addToHistory dataArr=" + current.dataArr);
+    // check that stateChanges is not empty
     if (Object.keys(stateChanges).length !== 0) {
       for (const prop in stateChanges) {
         current[prop] = stateChanges[prop];
       }
-      this.setState({ history: history.concat([current]) });
+
+      if (this.state.index < history.length - 1) {
+        history = history.slice(0, this.state.index);
+      }
+
+      this.setState({
+        history: history.concat([current]),
+        index: this.state.index + 1
+      });
+    }
+  }
+
+  rewind(e) {
+    const i = this.state.index;
+
+    if (i > 0) {
+      this.setState({ index: i - 1 });
+    }
+  }
+
+  fastForward(e) {
+    const i = this.state.index;
+
+    if (i < this.state.history.length - 1) {
+      this.setState({ index: i + 1 });
     }
   }
 
   updateState(e) {
-    console.log("In updateState");
+    console.log("In updateState data=" + e.target.value);
     this.addToHistory({ data: e.target.value });
   }
 
   sortSetup(e) {
     const history = this.state.history;
-    const current = history[history.length - 1];
+    const current = history[this.state.index];
     let newMid = Math.floor((current.hi + current.lo) / 2);
     const tempDataArr = current.data.split("\n");
 
@@ -60,7 +87,7 @@ class ManualSort extends React.Component {
 
   sortData(e) {
     const history = this.state.history;
-    const current = history[history.length - 1];
+    const current = history[this.state.index];
     let mid = Math.floor((current.hi + current.lo) / 2);
     let stateTmp = {};
 
@@ -84,10 +111,8 @@ class ManualSort extends React.Component {
           tmpArr.splice(current.i, 1);
           tmpArr.splice(current.lo, 0, tmpItem);
 
-          stateTmp = {
-            dataArr: tmpArr,
-            data: tmpArr.join("\n")
-          };
+          stateTmp.dataArr = tmpArr;
+          stateTmp.data = tmpArr.join("\n");
         // drop through to the next case
 
         case current.i === current.hi && current.i === current.lo:
@@ -101,21 +126,17 @@ class ManualSort extends React.Component {
       if (current.i < current.dataArr.length) {
         // set button text up for next comparison
         let newMid = Math.floor((current.hi + current.lo) / 2);
-        stateTmp = {
-          buttonA: current.dataArr[newMid],
-          buttonB: current.dataArr[current.i]
-        };
+        stateTmp.buttonA = current.dataArr[newMid];
+        stateTmp.buttonB = current.dataArr[current.i];
       } else {
         // sort is done, hide buttons and reset state
-        stateTmp = {
-          dataArr: [],
-          showButtons: false,
-          buttonA: "",
-          buttonB: "",
-          i: 1,
-          hi: 1,
-          lo: 0
-        };
+        stateTmp.dataArr = [];
+        stateTmp.showButtons = false;
+        stateTmp.buttonA = "";
+        stateTmp.buttonB = "";
+        stateTmp.i = 1;
+        stateTmp.hi = 1;
+        stateTmp.lo = 0;
       }
     }
 
@@ -126,15 +147,21 @@ class ManualSort extends React.Component {
 
   render() {
     const history = this.state.history;
-    const current = history[history.length - 1];
+    const current = history[this.state.index];
 
     return (
-      <SortBox
-        {...current}
-        onChange={this.updateState}
-        onClick={this.sortData}
-        onStart={this.sortSetup}
-      />
+      <div>
+        <SortBox
+          {...current}
+          onChange={this.updateState}
+          onClick={this.sortData}
+          onStart={this.sortSetup}
+        />
+        <hr />
+        index={this.state.index} <br />
+        <input type="button" value="<<" onClick={this.rewind} />
+        <input type="button" value=">>" onClick={this.fastForward} />
+      </div>
     );
   }
 }
