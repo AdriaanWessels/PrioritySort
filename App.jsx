@@ -16,7 +16,8 @@ class ManualSort extends React.Component {
           hi: 1,
           lo: 0
         }
-      ]
+      ],
+      index: 0
     };
 
     this.updateState = this.updateState.bind(this);
@@ -28,14 +29,16 @@ class ManualSort extends React.Component {
     const history = this.state.history;
     const current = history[history.length - 1];
 
-    for (const prop in stateChanges) {
-      current[prop] = stateChanges[prop];
+    if (Object.keys(stateChanges).length !== 0) {
+      for (const prop in stateChanges) {
+        current[prop] = stateChanges[prop];
+      }
+      this.setState({ history: history.concat([current]) });
     }
-
-    this.setState({ history: history.concat([current]) });
   }
 
   updateState(e) {
+    console.log("In updateState");
     this.addToHistory({ data: e.target.value });
   }
 
@@ -44,6 +47,8 @@ class ManualSort extends React.Component {
     const current = history[history.length - 1];
     let newMid = Math.floor((current.hi + current.lo) / 2);
     const tempDataArr = current.data.split("\n");
+
+    console.log("In sortSetup");
 
     this.addToHistory({
       dataArr: tempDataArr,
@@ -57,6 +62,7 @@ class ManualSort extends React.Component {
     const history = this.state.history;
     const current = history[history.length - 1];
     let mid = Math.floor((current.hi + current.lo) / 2);
+    let stateTmp = {};
 
     if (current.i < current.dataArr.length) {
       // perform the next step of the binary search
@@ -78,10 +84,10 @@ class ManualSort extends React.Component {
           tmpArr.splice(current.i, 1);
           tmpArr.splice(current.lo, 0, tmpItem);
 
-          this.addToHistory({
+          stateTmp = {
             dataArr: tmpArr,
             data: tmpArr.join("\n")
-          });
+          };
         // drop through to the next case
 
         case current.i === current.hi && current.i === current.lo:
@@ -95,13 +101,13 @@ class ManualSort extends React.Component {
       if (current.i < current.dataArr.length) {
         // set button text up for next comparison
         let newMid = Math.floor((current.hi + current.lo) / 2);
-        this.addToHistory({
+        stateTmp = {
           buttonA: current.dataArr[newMid],
           buttonB: current.dataArr[current.i]
-        });
+        };
       } else {
         // sort is done, hide buttons and reset state
-        this.addToHistory({
+        stateTmp = {
           dataArr: [],
           showButtons: false,
           buttonA: "",
@@ -109,9 +115,13 @@ class ManualSort extends React.Component {
           i: 1,
           hi: 1,
           lo: 0
-        });
+        };
       }
     }
+
+    console.log("In sortData");
+
+    this.addToHistory(stateTmp);
   }
 
   render() {
